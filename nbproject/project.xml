@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.php.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/php-project/1">
+            <name>POI_TSEL</name>
+        </data>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>ALAMAT</word>
+            <word>BARU</word>
+            <word>Belum</word>
+            <word>Duplikiat</word>
+            <word>GAGAL</word>
+            <word>IndiHome</word>
+            <word>INSTALASI</word>
+            <word>IWS</word>
+            <word>JATIM</word>
+            <word>KETERANGAN</word>
+            <word>KUNJUNGAN</word>
+            <word>MITRA</word>
+            <word>TCARES</word>
+            <word>TELEPON</word>
+            <word>TSEL</word>
+            <word>UTAMA</word>
+            <word>WITEL</word>
+        </spellchecker-wordlist>
+    </configuration>
+</project>
