@@ -105,6 +105,7 @@ echo $alert;
   </div>
   </div> 
       <a onclick="window.location.href='<?php echo $link; ?>'" class="btn btn-primary btn-sm">Kembali</a>
+      <a onclick="DeleteConf('deployment')" id="demo" class="btn btn-danger btn-sm">Hapus Data</a>
   </div>
   </div>
 <?php include "mod/footer.php"; ?>
@@ -112,13 +113,18 @@ echo $alert;
     <script src="js/jquery-2.1.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="js/simontor.js"></script>
     <script>
-    $(document).ready( function () {
+    function DeleteConf(before_page){
+        var witel = getUrlVars()['witel'];
+        var tipe_site = getUrlVars()['tipe_site'];
+        var jenis = getUrlVars()['jenis'];
+        window.location.assign('delete.sitac.php?witel='+witel+'&tipe_site='+tipe_site+'&before_page='+before_page+'&jenis='+jenis);
+    }
     $('#table_id').DataTable({
       "scrollX": false,
       "autoWidth": false
       });  
-    });
     </script>  
 
   </body>
