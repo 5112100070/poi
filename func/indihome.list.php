@@ -7,7 +7,7 @@
  */
 
 if(empty($_GET['tipe_site'])){
-    $_GET['tipe_site']="";
+    $_GET['tipe_site']="ALL";
 }
 
 if($_GET['tipe_site']=="INDIHOME"){

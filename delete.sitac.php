@@ -56,17 +56,54 @@ if($_GET['witel']=='all'){
 else{
     $witel= "WITEL='".$_GET['witel']."' ";
 }
-$sql = OCIParse($connect,
-        "SELECT ID,ID_WS,ID_SITE,NAMA_SITE,ALAMAT,STATUS_DATA,STATUS_INDIHOME,PRIORITAS,KOMENTAR"
+if($_GET['before_page']=='potensi'){
+    $sql_to_parse="SELECT ID,ID_WS,ID_SITE,NAMA_SITE,ALAMAT,STATUS_DATA,STATUS_INDIHOME,PRIORITAS,KOMENTAR"
         . " FROM REPORT_DATA_DEMAND WHERE ".$witel." ".$tipe_site
-        ."ORDER BY WITEL");
+        ."ORDER BY WITEL";
+    $url_method="delete.sitac.process.php?witel=".$_GET['witel']."&tipe_site=".$_GET['tipe_site']."&before_page=".$_GET['before_page'];
+}
+else if($_GET['before_page']=='sitac'){
+    include "func/sitac.logic.list.php";
+    include "func/sitac.logic.var.php";
+    include './func/indihome.list.php';
+    $sql_to_parse="SELECT ID,WITEL,ID_SITE,NAMA_SITE,ALAMAT,STATUS_SITAC,MITRA_AP,STATUS_DATA,KET_STATUS_SITAC,ID_WS,KOMENTAR"
+        . " FROM ".$table." WHERE ".$witel." AND (".$jenis.") ".$tipe_site
+        ."ORDER BY PRIORITAS";
+    $url_method="delete.sitac.process.php?witel=".$_GET['witel']."&tipe_site=".$_GET['tipe_site']."&before_page=".$_GET['before_page']."&jenis=".$_GET['jenis'];
+}
+else if($_GET['before_page']=='deployment'){
+    include './func/progress.deployment.list.php';
+    include './func/indihome.list.php';
+    $sql_to_parse="SELECT ID,WITEL,ID_SITE,NAMA_SITE,ALAMAT,PRIORITAS,MITRA_AP,STATUS_CONS_JATIM,KETERANGAN_STATUS_DATA,ID_WS,KOMENTAR"
+        . " FROM REPORT_DATA_DEMAND WHERE ".$witel." AND ".$jenis." ".$tipe_site
+        ."ORDER BY PRIORITAS";
+    $url_method="delete.sitac.process.php?witel=".$_GET['witel']."&tipe_site=".$_GET['tipe_site']."&before_page=".$_GET['before_page']."&jenis=".$_GET['jenis'];
+}
+else{
+    $sql_to_parse="";
+}
+$sql = OCIParse($connect,$sql_to_parse);
 ociexecute($sql);
+
+if(!empty($_GET['status_delete'])){
+    if($_GET['status_delete']==1)
+        $alert = "<div id =\"error\" class=\"col-md-12\"><div class=\"form-group\"><div class=\"alert alert-dismissable alert-success\" style=\"background-color: green;\">
+              <button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>
+              <strong>SUKSES!</strong> DATA BERHASIL DIDELETE !
+              </div></div></div>";
+    else $alert = "<div id =\"error\" class=\"col-md-12\"><div class=\"form-group\"><div class=\"alert alert-dismissable alert-success\" style=\"background-color: red;\">
+              <button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>
+              <strong>ERROR!</strong> TERJADI KESALAHAN TEKNIS !
+              </div></div></div>";
+echo $alert;
+}
 ?>
   <div class="container">
   <h3 align="center"><strong>DETIL DATA POTENSI ORDER - WITEL <?php echo $_GET['witel']; ?></strong></h3><br />.
   <h3 align="center" class="board-delete"><strong>Pilih Data yang Akan Dihapus</strong></h3><br />
+  <form action="<?php echo $url_method; ?>" method="post">
   <div class="panel panel-default">
-  <div class="panel-body">
+      <div class="panel-body">
 <div class="row">
 <?php 
 if(!empty($_GET['status_update'])){
@@ -84,79 +121,96 @@ echo $alert;
 ?>
 </div>
 <div class="row">
-<div class="col-md-12">
-    <p><a href="get.sitak.php?jenis=<?php echo $_GET['jenis']; ?>&witel=<?php echo $_GET['witel']; ?>&tgl=<?php echo $_GET['tgl']; ?>" style="text-decoration:none"><font color="green"><strong><i class="fa fa-file-excel-o"></i> EXPORT TO EXCEL</strong></font></a></p>
+    <div class="col-md-12">
+        <table class="table table-bordered" id="table_id">
+            <thead bgcolor="#E12E32" style="color:#FFFFFF" style="position: fixed">
+              <tr>
+                <td align="center" width="5%"><strong>ACT</strong></td>
+                <td><center><strong>ID TSEL</strong></center></td>
+                <td><center><strong>ID WS</strong></center></td>
+                <td><center><strong>NAMA SITE</strong></center></td>
+                <td><center><strong>ID SITE</strong></center></td>
+                <td><center><strong>ALAMAT</strong></center></td>
+                <td><center><strong>KOMENTAR</strong></center></td>
+               </tr>
+            </thead>
+        </table>
+    </div>
+<div class="col-md-12" style="height: 600px;overflow: auto;">
 <table class="table table-bordered" id="table_id">
-  <thead bgcolor="#E12E32" style="color:#FFFFFF">
-    <tr>
-      <td align="center" width="5%"><strong>ACT</strong></td>
-      <td><center><strong>ID TSEL</strong></center></td>
-      <td><center><strong>ID WS</strong></center></td>
-      <td><center><strong>NAMA SITE</strong></center></td>
-      <td><center><strong>ID SITE</strong></center></td>
-      <td><center><strong>ALAMAT</strong></center></td>
-      <td><center><strong>PRIO</strong></center></td>
-      <td><center><strong>KOMENTAR</strong></center></td>
-     </tr>
-  </thead>
   <tbody>
   <?php while($row = oci_fetch_array($sql)) { ?>
   <tr>
     <td align="center">
-        <a class="edit" href="edit.potensi.php?site_id=<?php echo $row[0] ?>&witel=<?php echo $_GET['witel'] ?>" style="text-decoration:none"><font color="#E12E32"><i class="fa fa-pencil"></i></font></a>
-        <input type="checkbox" value="<?php echo $row['ID']; ?>">
+        <input name="items_to_delete[]" type="checkbox" value="<?php echo $row['ID']; ?>">
     </td>
     <td><?php echo $row['ID']; ?></td>
     <td><?php echo $row['ID_WS']; ?></td>
     <td><?php echo $row['NAMA_SITE']; ?></td>
     <td><?php echo $row['ID_SITE']; ?></td>
     <td><?php echo $row['ALAMAT']; ?></td>
-    <td><?php echo $row['PRIORITAS']; ?></td>
     <td><?php echo $row['KOMENTAR']; ?></td>
   </tr>
   <?php } ?>
+  </tbody>
   </table> 
   </div>
   </div> 
-      <a onclick="window.location.href='index.php'" class="btn btn-primary btn-sm">Kembali</a>
-      <a id="btn-delete" href="#" class="btn btn-success btn-sm">Hapus Data</a>
-      <a id="btn-delete-auth" href="#" class="btn btn-danger btn-sm pull-right">Hapus Data dari Dashboard</a>
+      <a onclick="BackToDetail()" class="btn btn-primary btn-sm">Kembali</a>
+      <button type="submit" class="btn btn-danger btn-sm">Hapus Data yang Dipilih</button>>
   </div>
   </div>
+  </form>
 <?php include "mod/footer.php"; ?>
   </div>
     <script src="js/jquery-2.1.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="js/jquery.screwdefaultbuttonsV2.min.js"></script>
-    
-    <script>
-     $('input:checkbox').screwDefaultButtons({
+    <script type="text/javascript" src="js/simontor.js"></script>
+    <script type="text/javascript">
+     /*var list_data_delete=[];
+     function push_deleted_data(data_to_delete){
+         var duplicate_data = false;
+         if(list_data_delete.length==0)
+             list_data_delete.push(data_to_delete);
+         else{
+             for(var i=0;i<list_data_delete.length;i++){
+                 if(list_data_delete[i]==data_to_delete){
+                    duplicate_data=true; 
+                    break;
+                 }
+             }
+             if(duplicate_data==false)list_data_delete.push(data_to_delete);
+         }
+     };
+        $(document).ready(function (){
+            $('.styledCheckbox').change(function (){
+                alert($('.styledCheckbox').get);
+                push_deleted_data($('.styledCheckbox input:checkbox:checked').attr("id"));
+                alert(list_data_delete);
+            });
+        });*/
+        function BackToDetail(){
+            var witel = getUrlVars()['witel'];
+            var tipe_site = getUrlVars()['tipe_site'];
+            if(getUrlVars()['before_page']=='potensi')window.location.assign('detil.potensi.php?witel='+witel+'&tipe_site='+tipe_site);
+            else if(getUrlVars()['before_page']=='sitac'){
+                var jenis = getUrlVars()['jenis'];
+                window.location.assign('detil.potensi.php?witel='+witel+'&tipe_site='+tipe_site+'&jenis='+jenis);
+            }
+            else if(getUrlVars()['before_page']=='deployment'){
+                var jenis = getUrlVars()['jenis'];
+                window.location.assign('detil.progress.deployment.php?witel='+witel+'&tipe_site='+tipe_site+'&jenis='+jenis);
+            }
+            else window.location.assign('index.php');
+        }
+        
+        $('input:checkbox').screwDefaultButtons({
         image: "url(img/checkbox.jpg)",
         width: 43,
         height: 43,
         });
-    $(document).ready( function () {
-        $('.styledCheckbox').hide("fast","linear",function (){
-            $('.board-delete').hide();
-            $('#btn-delete-auth').hide();
-            $('#table_id').DataTable({
-                "scrollX": false,
-                "autoWidth": false
-            });
-        });
-        
-        $('#btn-delete').click(function (){
-            $('.styledCheckbox').toggle();
-            $('.edit').toggle();
-            $('.board-delete').toggle();
-            $('#btn-delete-auth').toggle();
-            if(document.getElementById('btn-delete').innerHTML.toLowerCase()=='hapus data')
-                document.getElementById('btn-delete').innerHTML='Batal';
-            else
-                document.getElementById('btn-delete').innerHTML='Hapus Data';
-        });
-    });
     </script>  
 
   </body>
