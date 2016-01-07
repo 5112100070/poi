@@ -100,6 +100,7 @@ echo $alert;
   </table> 
   </div>
   </div>
+      <a onclick="window.location.assign('delete.user.php')" id="demo" class="btn btn-danger btn-sm">Hapus Data</a>
   </div>
   </div>
 <?php include "mod/footer.php"; ?>
